@@ -1,0 +1,24 @@
+Default: &defaults
+  user: yuplanner
+  password: yuplanner
+  host: localhost
+  port: 5432
+  database: yuplanner
+  poolsize: 10
+
+Development:
+  <<: *defaults
+
+Testing:
+  database: yuplanner_test
+  <<: *defaults
+
+Staging:
+  database: yuplanner_staging
+  poolsize: 100
+  <<: *defaults
+
+Production:
+  database: yuplanner_production
+  poolsize: 100
+  <<: *defaults
