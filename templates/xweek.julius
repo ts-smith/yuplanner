@@ -1,0 +1,41 @@
+function addAssignment(url, section, description){
+   $.post(url, { section : section, description : description }, 
+      function (data) {
+         alert(data);
+      });
+}
+
+function showForm(url, dateString, dayString){
+
+   if(screen.width < 800){
+      $("#target").css("left", "5%");
+   }
+   $("#target").css("visibility", "visible");
+   $("#targetForm").attr("action",url);
+   $("#dueLabel").html(dayString + ", " + dateString);
+   $("#mask").removeClass("nodisplay").addClass("display");
+};
+
+function revert(){
+   $("#mask").removeClass("display").addClass("nodisplay");
+   $("#target").css("visibility", "hidden");
+   $("#deleteDiv").css("visibility", "hidden");
+   $("#deleteField").val("");
+};
+function deleteAssignment(url){
+ 
+   if(screen.width < 800){
+      $("#deleteDiv").css("left", "5%");
+   }  
+   $("#mask").removeClass("nodisplay").addClass("display");
+   $("#deleteDiv").css("visibility", "visible");
+
+   $("#deleteButton").attr("onclick", "actuallyDelete('" + url + "')");
+
+   //window.location.replace(url);
+}
+function actuallyDelete(url){
+   deleteText = $("#deleteField").val();
+   if (deleteText == "DELETE")
+      window.location.replace(url);
+}

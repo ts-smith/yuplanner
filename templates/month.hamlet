@@ -1,0 +1,47 @@
+<div id=mask class=nodisplay onclick="revert()">
+<div id=target>
+   <h2 id=dueLabel>
+   <form id=targetForm method=post>
+      ^{fWidget}
+      <input type=submit value="Add Assignment">
+<div id=deleteDiv>
+   <p>Enter DELETE to delete assignment
+   <input id=deleteField type=text>
+      <div class=button id=deleteButton>Delete
+$if ((/=) offset 0)
+   <a href=@{MonthDupR $ (-) offset 1}>
+         <div class="button left">Last Month
+<a href=@{MonthDupR $ (+) offset 1}>
+   <div class="button right">Next Month
+<table id=assignmentTable>
+   <tr>
+      <td><h3>Sunday</h3>
+      <td> <h3>Monday</h3>
+      <td> <h3>Tuesday</h3>
+      <td> <h3>Wednesday</h3>
+      <td> <h3>Thursday</h3>
+      <td> <h3>Friday</h3>
+      <td> <h3>Saturday</h3>
+   $forall week <- weeks
+      <tr>
+         $forall (day,valid) <- week
+            $if valid
+               <td class="validCell #{dayStyle day}">
+                  <div class=heightSetter>
+                     <div class="dateHeading #{dayStyle day}">
+                        <h2>#{apostrophize $ T.drop 2 $ showT day}
+                        $if (&&) (weekDay day) ((>=) day today)
+                           <div class="button calendarButton" onclick="showForm('@{AssignmentR (showT day) "month" offset}', '#{showT day}', '#{toString $ gpm day}')">Add
+                     $maybe list <- getDueThatDay day groupedDels
+                        $forall (Entity delId (Deliverable s a d dueDay _)) <- list
+                           <div class=#{sectionToClass s}>
+                              <small>
+                                 <h5 class=inline> #{valToKey s sections}
+                              <div>
+                                 <p class="tableAssignment inline">#{a} 
+                                    <div class=delete onclick="deleteAssignment('@{DeleteR delId "month" offset}')">X
+                                 <p class=tableDescription>#{d}
+                     $nothing
+            $else
+               <td class=invalidCell>
+                  <h2>#{showT day}

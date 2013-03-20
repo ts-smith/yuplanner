@@ -1,0 +1,96 @@
+/*.button
+   display:inline-block;
+   width: 75px;
+   background-color: #8A2BE1;
+   color: white;
+   text-align: center;
+#target, #deleteDiv 
+   color:#F0E78C !important;
+   visibility: hidden;
+   background: #7B67EC;
+   position:fixed;
+   top:55px;
+   margin: 0 auto;
+   z-index :1001;
+   left: 50%;
+   padding:4px;
+#target label
+   color:#F0E78C !important;
+
+.nodisplay
+   visibility:hidden;
+   opacity:0.0;
+
+.display
+   visibility:visible;
+   opacity:0.5
+   filter:alpha(opacity=60);
+
+#mask
+   transition: opacity 0.15s linear;
+   -webkit-transition: opacity 0.15s linear;
+   -moz-transition: opacity 0.15s linear;
+   -o-transition: opacity 0.15s linear;
+   background-color:#222222;
+   z-index:500;
+   position: fixed;
+   height: 100%;
+   width: 100%;
+   margin: 0;
+   padding: 0;
+   left: 0;
+   top: 0;
+   bottom: 0;
+   right: 0;
+   overflow:hidden;
+
+ul
+   list-style-type: none;
+.day
+   width: 600px;
+   border: 1px solid #696969;
+   border-radius: 2px;
+   background-color: #F0FFFF;
+   margin-bottom: 8px;
+.inline
+   display:inline;
+   
+.delete
+   width:10px;
+   position:relative;
+   bottom:1px;
+.delete:hover
+   cursor:pointer;
+#deleteDiv
+   z-index;2000;
+   background-color:#808080;
+   border: 1px solid #FD0002 !important;
+   border-radius: 3px;
+#deleteButton
+   background-color:#FD0002 !important;
+#deleteButton
+   cursor:pointer;
+.panel
+   width: 50%;
+   background-color: #E4E7FA;
+   border-radius: 5px;
+
+.assignment
+   margin-bottom: 1px;
+.description
+   margin-left: 4px;
+   background-color: #E4E7FA;
+   border: 0;
+   border-left: 1px solid #4682B4;
+   border-radius:0;
+   word-break: normal !important;
+
+.submitButton
+   width: 120px;
+   margin-left: 3px;
+   background-color: #69A7F4;
+.submitButton:hover
+   cursor:pointer;
+*/
+ul
+   

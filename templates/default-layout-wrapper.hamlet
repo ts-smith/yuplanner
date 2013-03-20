@@ -13,6 +13,7 @@ $newline never
         <meta name="author" content="">
 
         <meta name="viewport" content="width=device-width,initial-scale=1">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
 
         ^{pageHead pc}
 
@@ -26,10 +27,16 @@ $newline never
         <div class="container">
             <header>
             <div id="main" role="main">
+              <div id=nav>
+                 <ul>
+                     <a class=button href=@{MonthR}><li>Month View</li>
+                     <a class=button href=@{DateR}><li>Week View</li>
+              <h1>Year Up Planner
               ^{pageBody pc}
-            <footer>
-                #{extraCopyright $ appExtra $ settings master}
 
+        <div id=mediaDetect>
+        <script>
+            moveMask();
         $maybe analytics <- extraAnalytics $ appExtra $ settings master
             <script>
               if(!window.location.href.match(/localhost/)){

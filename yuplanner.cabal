@@ -20,6 +20,8 @@ library
                      Settings.StaticFiles
                      Settings.Development
                      Handler.Home
+                     Handler.Date
+                     Util.EasyDate
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -71,6 +73,8 @@ library
                  , conduit                       >= 1.0
                  , monad-logger                  >= 0.3
                  , fast-logger                   >= 0.3
+                 , time
+                 , split
 
 executable         yuplanner
     if flag(library-only)
@@ -96,6 +100,6 @@ test-suite test
                  , yesod-default
                  , yesod-core
                  , persistent
-                 , persistent-postgresql
+                 , persistent-sqlite
                  , resourcet
                  , monad-logger

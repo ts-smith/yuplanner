@@ -7,5 +7,23 @@ Email
     user UserId Maybe
     verkey Text Maybe
     UniqueEmail email
+Deliverable
+    section Text
+    assignmentName Text
+    description Text
+    dueDate Day
+    deleted Bool
+    deriving Show Eq Ord
+Comment
+    parent DeliverableId
+    commentText Text
+    signature Text Maybe
+    created UTCTime now()
+    deriving Show Eq Ord
+SimpleUser
+    emailAddress Text
+    notificationSettings Text
+    UniqueSimpleUser emailAddress
+
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

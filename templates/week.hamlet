@@ -1,0 +1,34 @@
+<div id=mask class=nodisplay onclick="revert()">
+<div id=target class="hidden hTform">
+   <h2 id=dueLabel>
+   <form id=targetForm method=post>
+      ^{fWidget}
+      <input type=submit value="Add Assignment">
+<div id=deleteDiv>
+   <p>Enter DELETE to delete assignment
+   <input id=deleteField type=text>
+   <div class=button id=deleteButton>Delete
+$if goLeft
+   <a href=@{HorribleDuplicateR $ (-) week 1}>
+      <div class="button left">Last Week
+<a href=@{HorribleDuplicateR $ (+) week 1}>
+   <div class="button right">Next Week
+<ul>
+   $forall (dayEnts,day,(offset,index)) <- elems
+      <li class=day id=index#{index}>
+         <h2>#{T.pack $ niceFormat offset day}
+         $with d <- showT day
+            <div class="submitButton button" onclick="showForm('@{AssignmentR d "week" week}', '#{d}', '#{toString offset}', '#{index}')">Post Assignment
+         <ul>
+            $maybe entList <- dayEnts
+               $forall (Entity delId (Deliverable s a d _ _))<- entList
+                  <li class=inline>
+                     <h3 class=inline>#{valToKey s sections}
+                     <div class=panel>
+                        <p class="assignment inline">#{a} 
+                           <div class=delete onclick="deleteAssignment('@{DeleteR delId "week" week}')">X
+                        <pre class=description>#{d}
+
+            $nothing
+               <li>
+                  <p>Nothing posted yet

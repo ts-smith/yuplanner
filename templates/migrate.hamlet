@@ -1,0 +1,7 @@
+<ul>
+   $forall (Entity _ (Deliverable s a d day _)) <- assignments
+      <li>
+         <p> #{s}
+         <p> #{a}
+         <p> #{d}
+         <p> #{showT day}

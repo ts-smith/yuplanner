@@ -4,4 +4,21 @@
 /favicon.ico FaviconR GET
 /robots.txt RobotsR GET
 
-/ HomeR GET POST
+
+/olddontgohere HomeR GET POST
+
+/week DateR GET
+/week/#Int HorribleDuplicateR GET
+
+/ MonthR GET
+/month/#Int MonthDupR GET
+
+/delete/#DeliverableId/#Text/#Int DeleteR POST
+/restore/#Text RestoreR GET
+
+/migrate MigrateR GET
+/unmigrate UnmigrateR GET POST
+
+/submitAssignment/#Text/#Text/#Int AssignmentR POST
+
+/redir  RedirR GET

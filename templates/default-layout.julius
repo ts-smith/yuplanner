@@ -1,0 +1,64 @@
+function addAssignment(url, section, description){
+   $.post(url, { section : section, description : description },
+      function (data) {
+         alert(data);
+      });
+}
+function showForm(url, dateString, dayString, index){
+
+   if(screen.width < 800){
+      $("#target").css("left", "5%");
+   }
+   $("#target").css("visibility", "visible");
+   $("#targetForm").attr("action",url);
+   $("#dueLabel").html(dayString + ", " + dateString);
+   $("#mask").removeClass("nodisplay").addClass("display");
+};
+
+
+function revert(){
+   $("#mask").removeClass("display").addClass("nodisplay");
+   $("#target").css("visibility", "hidden");
+   $("#deleteDiv").css("visibility", "hidden");
+   $("#deleteField").val("");
+}
+function deleteAssignment(url){
+ 
+   if(screen.width < 800){
+      $("#deleteDiv").css("left", "5%");
+   }   
+   $("#mask").removeClass("nodisplay").addClass("display");
+   $("#deleteDiv").css("visibility", "visible");
+
+   $("#deleteButton").attr("onclick", "actuallyDelete('" + url + "')");
+
+   //window.location.replace(url);
+}
+function actuallyDelete(url){
+   deleteText = $("#deleteField").val();
+   if (deleteText == "DELETE"){
+      $.post(url, function(response){
+         if("Success" == response){
+            location.reload(true);
+         }
+      });
+   }
+}
+
+function moveMask(){
+   $("#target").appendTo('body');
+   $("#mask").appendTo('body');
+   $("#deleteDiv").appendTo('body');
+
+
+   var $is_mobile = false;
+
+   if( $('#mediaDetect').css('display') == 'none' ) {
+      $is_mobile = true;      
+   }
+   if ($is_mobile){
+      $("#mask").addClass("mobilePositioning");
+      $("#target").addClass("mobilePositioning");
+      $("#deleteDiv").addClass("mobilePositioning");
+   }
+}
