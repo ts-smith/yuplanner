@@ -1,9 +1,9 @@
 Default: &defaults
-  user: yuplanner
-  password: yuplanner
-  host: localhost
+  user: ejgcawkqyedgrv
+  password: f1YpK4EjX2QLcxvVLwdpbQdge6
+  host: ec2-54-243-250-125.compute-1.amazonaws.com
   port: 5432
-  database: yuplanner
+  database: d45fsql4989lft
   poolsize: 10
 
 Development:
