@@ -8,7 +8,6 @@
    <p>Enter DELETE to delete assignment
    <input id=deleteField type=text>
    <div class=button id=deleteButton>Delete
-#{showT now}
 $if goLeft
    <a href=@{HorribleDuplicateR $ (-) week 1}>
       <div class="button left">Last Week
