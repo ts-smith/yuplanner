@@ -12,6 +12,7 @@ import Data.List (groupBy)
 
 getDateR :: Handler RepHtml
 getDateR = do
+   now <- liftIO getNow
    day <- liftIO getDay
    {-joinedDeliverables <- runDB $ runJoin (selectOneMany (CommentParent <-.) commentParent) 
       { somOrderOne  = [Asc DeliverableDueDate]
@@ -36,6 +37,7 @@ getDateR = do
 
 getHorribleDuplicateR :: Int -> Handler RepHtml
 getHorribleDuplicateR weeks = do
+   now <- liftIO getNow
    dayOrigin <- liftIO getDay
    let day = (addDays (7 * fromIntegral weeks) dayOrigin)
    deliverables <- runDB $ selectList [DeliverableDueDate >=. day,

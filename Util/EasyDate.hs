@@ -19,6 +19,9 @@ import Data.List.Split
 --date :: IO (Integer,Int,Int) -- :: (year,month,day)
 --date = getCurrentTime >>= return . toGregorian . utctDay
 
+getNow :: IO TimeOfDay
+getNow = fmap (localTimeOfDay . zonedTimeToLocalTime) getZonedTime
+
 data Weekday = Monday | Tuesday | Wednesday | Thursday | Friday | Saturday | Sunday
    deriving (Enum, Show, Bounded)
 
