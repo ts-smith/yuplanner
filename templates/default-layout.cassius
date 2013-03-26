@@ -16,6 +16,9 @@
    background-color: #8A2BE1;
    color: white;
    text-align: center;
+
+.summary
+   width: 120px !important;
  
 #target, #deleteDiv 
    color:#F0E78C !important;

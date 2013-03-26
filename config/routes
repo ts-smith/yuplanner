@@ -11,7 +11,9 @@
 /week/#Int HorribleDuplicateR GET
 
 / MonthR GET
-/month/#Int MonthDupR GET
+/month/#Text/#Int MonthDupR GET
+
+/summary SummaryR GET POST
 
 /delete/#DeliverableId/#Text/#Int DeleteR POST
 /restore/#Text RestoreR GET
@@ -19,6 +21,6 @@
 /migrate MigrateR GET
 /unmigrate UnmigrateR GET POST
 
-/submitAssignment/#Text/#Text/#Int AssignmentR POST
+/submitAssignment/#Text/#Text/#Text/#Int AssignmentR POST
 
 /redir  RedirR GET

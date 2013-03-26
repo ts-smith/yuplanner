@@ -66,6 +66,7 @@ getMonthR = do
                        | otherwise = ""
        apostrophize dateText = T.cons '\'' dateText
        offset = 0
+       neg = False
    deliverables <- runDB $ selectList [DeliverableDueDate >=. firstDay,
                                     DeliverableDueDate <=. lastDay,
                                     DeliverableDeleted !=. True]
@@ -74,11 +75,12 @@ getMonthR = do
    (fWidget, enctype) <- generateFormPost assignmentForm
    defaultLayout $ do
       $(widgetFile "month")
+
     
-getMonthDupR :: Int -> Handler RepHtml
-getMonthDupR offset = do
+getMonthDupR :: Text -> Int -> Handler RepHtml
+getMonthDupR isNeg offset = do
    today <- liftIO getDay
-   let (month@(firstDay:_), lastDay) = getMonth $ addGregorianMonthsClip (toInteger offset) today
+   let (month@(firstDay:_), lastDay) = getMonth $ addGregorianMonthsClip trueOffset today
        validDays = frontPadding firstDay
                 ++ (zip month $ repeat True)
                 ++ backPadding lastDay
@@ -88,6 +90,9 @@ getMonthDupR offset = do
                        | not $ weekDay theDay = "weekend"
                        | otherwise = ""
        apostrophize dateText = T.cons '\'' dateText
+       neg = if isNeg == "n" then True else False
+       trueOffset :: Integer
+       trueOffset = if neg then negate (toInteger offset) else toInteger offset
    deliverables <- runDB $ selectList [DeliverableDueDate >=. firstDay,
                                     DeliverableDueDate <=. lastDay,
                                     DeliverableDeleted !=. True]
@@ -96,10 +101,9 @@ getMonthDupR offset = do
    (fWidget, enctype) <- generateFormPost assignmentForm
    defaultLayout $ do
       $(widgetFile "month")
-    
 
-postAssignmentR :: Text -> Text -> Int -> Handler RepHtml
-postAssignmentR dayText monthOrWeek offset = do
+postAssignmentR :: Text -> Text -> Text -> Int -> Handler RepHtml
+postAssignmentR dayText monthOrWeek neg offset = do
    let day = (readT dayText :: Day)
    ((res, fWidget), enctype) <- runFormPost assignmentForm
    case res of
@@ -110,7 +114,7 @@ postAssignmentR dayText monthOrWeek offset = do
                     redirect $ if monthOrWeek == "week" then if offset == 0 then DateR
                                                                             else HorribleDuplicateR offset
                                                         else if offset == 0 then MonthR
-                                                                            else MonthDupR offset
+                                                                            else MonthDupR neg offset
             else defaultLayout $ do --redirect!!!
                         [whamlet|<p>Improper Validation|]
 
@@ -162,6 +166,32 @@ postUnmigrateR = do
     [whamlet|
     $forall del <- delList
       #{show del} |]
+      
+
+getSummaryR :: Handler RepHtml
+getSummaryR = do
+   (passwidget, enctype) <- generateFormPost getLinkForm
+   defaultLayout $ do [whamlet|
+<form method=post enctype=enctype>
+   ^{passwidget}
+   <input type=submit> |]
+
+postSummaryR :: Handler RepHtml
+postSummaryR = do
+   ((result, passwidget), enctype) <- runFormPost getLinkForm
+   case result of
+      FormSuccess _ -> do
+         (redirect ("https://docs.google.com/spreadsheet/ccc?key=0AtkrCCC5nMmsdHpTYmZCeG5CMnd6Y3RpVHl0dEN1bUE&usp=sharing" :: Text) :: GHandler sub master a)
+      _ -> do
+         setMessage "Wrong password"
+         redirect SummaryR
+
+validPasswordField :: (RenderMessage master FormMessage) => Field sub master Text
+validPasswordField = checkBool (== "yuplanner") ("Bad password" :: Text) passwordField
+
+getLinkForm :: Form Text
+getLinkForm = renderDivs $ areq validPasswordField "Password" Nothing
+
 
 getRedirR :: Handler RepHtml
 getRedirR = do
@@ -256,3 +286,12 @@ replaceElement xs i x = fore ++ (x : aft)
    where fore = take i xs 
          aft = drop (i+1) xs
 
+getLeft :: Bool -> Int -> (Text, Int)
+getLeft _ 0 = ("n", 1)
+getLeft False offset = ("p", offset - 1)
+getLeft _ offset = ("n", offset + 1)
+
+getRight :: Bool -> Int -> (Text, Int)
+getRight True 1 = ("p", 0)
+getRight True offset = ("n", offset - 1)
+getRight _ offset = ("p", offset + 1)

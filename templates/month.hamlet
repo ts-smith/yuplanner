@@ -8,11 +8,15 @@
    <p>Enter DELETE to delete assignment
    <input id=deleteField type=text>
       <div class=button id=deleteButton>Delete
-$if ((/=) offset 0)
-   <a href=@{MonthDupR $ (-) offset 1}>
-         <div class="button left">Last Month
-<a href=@{MonthDupR $ (+) offset 1}>
-   <div class="button right">Next Month
+
+$with (lb, lOffset) <- getLeft neg offset
+   <a href=@{MonthDupR lb lOffset}>
+      <div class="button left">Previous
+<a href=@{MonthR}>
+   <div class="button right"> Current
+$with (rb, rOffset) <- getRight neg offset
+   <a href=@{MonthDupR rb rOffset}>
+      <div class="button right">Next
 <table id=assignmentTable>
    <tr>
       <td><h3>Sunday</h3>
@@ -31,7 +35,7 @@ $if ((/=) offset 0)
                      <div class="dateHeading #{dayStyle day}">
                         <h2>#{apostrophize $ T.drop 2 $ showT day}
                         $if (&&) (weekDay day) ((>=) day today)
-                           <div class="button calendarButton" onclick="showForm('@{AssignmentR (showT day) "month" offset}', '#{showT day}', '#{toString $ gpm day}')">Add
+                           <div class="button calendarButton" onclick="showForm('@{AssignmentR (showT day) "month" "p" offset}', '#{showT day}', '#{toString $ gpm day}')">Add
                      $maybe list <- getDueThatDay day groupedDels
                         $forall (Entity delId (Deliverable s a d dueDay _)) <- list
                            <div class=#{sectionToClass s}>

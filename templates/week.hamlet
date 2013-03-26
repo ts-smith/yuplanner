@@ -18,7 +18,7 @@ $if goLeft
       <li class=day id=index#{index}>
          <h2>#{T.pack $ niceFormat offset day}
          $with d <- showT day
-            <div class="submitButton button" onclick="showForm('@{AssignmentR d "week" week}', '#{d}', '#{toString offset}', '#{index}')">Post Assignment
+            <div class="submitButton button" onclick="showForm('@{AssignmentR d "week" "p" week}', '#{d}', '#{toString offset}', '#{index}')">Post Assignment
          <ul>
             $maybe entList <- dayEnts
                $forall (Entity delId (Deliverable s a d _ _))<- entList
