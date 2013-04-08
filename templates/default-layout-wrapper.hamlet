@@ -27,10 +27,10 @@ $newline never
         <div class="container">
             <header>
             <div id="main" role="main">
-              <div id=nav>
+              <nav>
                  <ul>
-                     <a class=button href=@{MonthR}><li>Month View</li>
                      <a class=button href=@{DateR}><li>Week View</li>
+                     <a class=button href=@{MonthR}><li>Month View</li>
                      <a class="button summary" href=@{SummaryR}><li>Weekly Summary</li>
               <h1>Year Up Planner
               ^{pageBody pc}
@@ -38,6 +38,7 @@ $newline never
         <div id=mediaDetect>
         <script>
             moveMask();
+        $# ^{pageBody chatBox}
         $maybe analytics <- extraAnalytics $ appExtra $ settings master
             <script>
               if(!window.location.href.match(/localhost/)){

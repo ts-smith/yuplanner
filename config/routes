@@ -23,4 +23,11 @@
 
 /submitAssignment/#Text/#Text/#Text/#Int AssignmentR POST
 
+/assignment/#DeliverableId ViewAssignmentR GET
+/comment/#DeliverableId CommentR POST
+/signature SignatureR POST
+/removeSig/#DeliverableId UnsetR GET
+
+/chatState ChatStateR GET POST
+
 /redir  RedirR GET

@@ -13,13 +13,13 @@ Deliverable
     description Text
     dueDate Day
     deleted Bool
+    numComments Int 
     deriving Show Eq Ord
 Comment
     parent DeliverableId
-    commentText Text
+    commentText Html
     signature Text Maybe
     created UTCTime now()
-    deriving Show Eq Ord
 SimpleUser
     emailAddress Text
     notificationSettings Text

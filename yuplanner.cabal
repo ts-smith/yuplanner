@@ -22,6 +22,7 @@ library
                      Handler.Home
                      Handler.Date
                      Util.EasyDate
+                     Util.ChatState
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -75,6 +76,12 @@ library
                  , fast-logger                   >= 0.3
                  , time
                  , split
+                 , containers                    >= 0.4.2.1
+                 , stm                           >= 2.3
+                 , yesod-json                    >= 1.1.2.2
+                 , blaze-builder
+                 , wai-eventsource
+                 , random
 
 executable         yuplanner
     if flag(library-only)

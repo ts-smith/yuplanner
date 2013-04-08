@@ -5,4 +5,5 @@ import Settings             (parseExtra)
 import Application          (makeApplication)
 
 main :: IO ()
-main = defaultMain (fromArgs parseExtra) makeApplication
+main = do
+   defaultMain (fromArgs parseExtra) makeApplication

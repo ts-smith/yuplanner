@@ -3,12 +3,21 @@ module Handler.Date where
 import Import
 import qualified Data.Text as T
 import Data.Time.Calendar
-import Data.Monoid
 import Data.Maybe
-import Control.Applicative ((<$>), (<*>))
 import Data.List (groupBy)
---import Database.Persist.Query.Join (SelectOneMany (..), selectOneMany)
---import Database.Persist.Query.Join.Sql (runJoin)
+import Database.Persist.Query.Join (SelectOneMany (..), selectOneMany)
+import Database.Persist.Query.Join.Sql (runJoin)
+import Control.Concurrent
+import Control.Concurrent.STM
+import qualified Data.Sequence as Sq
+import Data.Time.Clock
+import System.Random
+
+import Yesod.Form.Nic (YesodNic, nicHtmlField)
+instance YesodNic App
+
+--look in views for what data is needed
+--dateHandler :: GHandler s m (Day, [,Int], Bool, Int, 
 
 getDateR :: Handler RepHtml
 getDateR = do
@@ -67,6 +76,8 @@ getMonthR = do
        apostrophize dateText = T.cons '\'' dateText
        offset = 0
        neg = False
+       makePlural :: Int -> Text
+       makePlural cc = if cc == 1 then "" else "s"
    deliverables <- runDB $ selectList [DeliverableDueDate >=. firstDay,
                                     DeliverableDueDate <=. lastDay,
                                     DeliverableDeleted !=. True]
@@ -91,6 +102,8 @@ getMonthDupR isNeg offset = do
                        | otherwise = ""
        apostrophize dateText = T.cons '\'' dateText
        neg = if isNeg == "n" then True else False
+       makePlural :: Int -> Text
+       makePlural cc = if cc == 1 then "" else "s"
        trueOffset :: Integer
        trueOffset = if neg then negate (toInteger offset) else toInteger offset
    deliverables <- runDB $ selectList [DeliverableDueDate >=. firstDay,
@@ -136,12 +149,12 @@ getMigrateR :: Handler RepPlain
 getMigrateR = do
    assignments <- runDB $ selectList [DeliverableDeleted !=. True]
                                      [Asc DeliverableDueDate]
-   let display = T.unlines $ map (\ (Entity _ (Deliverable s a d day _)) -> showDel s a d day) assignments
+   let display = T.unlines $ map (\ (Entity _ (Deliverable s a d day _ count)) -> showDel s a d day count) assignments
    return $ RepPlain $ toContent display
       where app = T.append
             delim = "<(|||)>"
-            showDel s a d day = showT s `app` delim `app` showT a 
-                                `app` delim `app` showT d `app` delim `app` showT day
+            showDel s a d day count = showT s `app` delim `app` showT a 
+                                `app` delim `app` showT d `app` delim `app` showT day `app` showT count
 
 getUnmigrateR :: Handler RepHtml
 getUnmigrateR = do
@@ -155,11 +168,12 @@ postUnmigrateR :: Handler RepHtml
 postUnmigrateR = do
    assignmentText <- runInputPost $ ireq textareaField "assignments"
    let textlines = T.lines $ unTextarea assignmentText
-       delList = map (\ [s,a,d,day] -> (Deliverable (readT s) 
+       delList = map (\ [s,a,d,day, count] -> (Deliverable (readT s) 
                                                     (readT a) 
                                                     (readT d)
                                                     (readT day)
-                                                    False))
+                                                    False)
+                                                    (readT count))
                  $ map (T.splitOn "<(|||)>") textlines
    mapM_ (runDB . insert) delList
    defaultLayout $ do
@@ -186,6 +200,79 @@ postSummaryR = do
          setMessage "Wrong password"
          redirect SummaryR
 
+getViewAssignmentR :: DeliverableId -> Handler RepHtml
+getViewAssignmentR assignId = do
+   ((Entity _ (Deliverable s a d day _ _)), comments) : _ <- runDB $ runJoin (selectOneMany (CommentParent <-.) commentParent) 
+      { somFilterOne = [DeliverableId ==. assignId]
+      , somIncludeNoMatch = True
+      , somOrderMany = [Asc CommentCreated]
+      }
+   (commentWidget, enctype) <- generateFormPost commentForm
+   signature <- lookupSession "signature"
+   defaultLayout $ do 
+      $(widgetFile "comments")
+      $(widgetFile "viewAssignment")      
+
+postCommentR :: DeliverableId -> Handler RepHtml
+postCommentR assignId = do
+   ((result, commentWidget), enctype) <- runFormPost commentForm
+   case result of
+      FormSuccess (content, _) -> do
+         signature <- lookupSession "signature"
+         createdTime <- liftIO getCurrentTime
+
+         runDB $ do
+            insert $ Comment assignId content signature createdTime
+            update assignId [DeliverableNumComments +=. 1]
+         redirect $ ViewAssignmentR assignId
+      _ -> do
+         setMessage "Form failed"
+         --redirect $ ViewAssignmentR assignId
+         defaultLayout $ do [whamlet|
+<form method=post>
+   ^{commentWidget}
+   <input type=submit>|]
+
+
+postSignatureR :: Handler RepJson
+postSignatureR = do
+   (Signature rawsig) <- parseJsonBody_
+   nid <- liftIO $ randomRIO (10000, 99999)
+   let sig@(Signature s) = Signature $ (T.take 50 $ rawsig) `T.append` "-" `T.append` (T.pack $ show (nid :: Int))
+   setSession "signature" s
+   jsonToRepJson sig
+
+getUnsetR :: DeliverableId -> Handler RepHtml
+getUnsetR returnId = do
+   deleteSession "signature"
+   redirect $ ViewAssignmentR returnId
+
+
+getChatStateR :: Handler RepJson
+getChatStateR = do
+   yesod <- getYesod
+   let csTVar = getChatStateTVar yesod
+   localTime <- liftIO getTime
+   --itemSequence <- liftIO $ readTVarIO csTVar
+   newSequence <- liftIO $ atomically $ do 
+      oldSeq <- readTVar csTVar
+      let newSeq = Sq.take 50 $ (Sq.|>) oldSeq $ ChatItem "the sender" localTime "the content"
+      writeTVar csTVar newSeq
+      return newSeq
+   
+   --defaultLayout $ do [whamlet| #{show $ Sq.length newSequence} |]
+   jsonToRepJson $ ChatItem "the sender" localTime "the content"
+
+postChatStateR :: Handler RepJson
+postChatStateR = do 
+   (Timeless ts tc) <- parseJsonBody_
+   time <- liftIO getTime
+   let second = 1000000
+   liftIO $ threadDelay (10 * second)
+   jsonToRepJson $ ChatItem ts time tc
+   
+
+
 validPasswordField :: (RenderMessage master FormMessage) => Field sub master Text
 validPasswordField = checkBool (== "yuplanner") ("Bad password" :: Text) passwordField
 
@@ -196,8 +283,6 @@ getLinkForm = renderDivs $ areq validPasswordField "Password" Nothing
 getRedirR :: Handler RepHtml
 getRedirR = do
    redirect DateR
-
-
 
 ------------------------
 --                    --
@@ -219,6 +304,12 @@ assignmentForm = renderDivs $ DAssignment
    <*> areq textField "Assignment Name" Nothing
    <*> areq textareaField "Description" Nothing
    <*> areq passwordField "Entry Code" Nothing
+
+commentForm :: Form (Html, Text)
+commentForm = renderDivs $ (,)
+   <$> areq nicHtmlField "Comment" Nothing
+   <*> areq validPasswordField "Entry Code" Nothing
+
    
 sections :: [(Text,Text)]
 sections = [("Business Communications", "BC"),
@@ -248,7 +339,7 @@ readT text = read $ T.unpack text
 
 validateAssignment :: Day -> DAssignment -> Maybe Deliverable
 validateAssignment day (DAssignment s a d _) = if weekDay day
-   then Just $ Deliverable s a (unTextarea d) day False
+   then Just $ Deliverable s a (unTextarea d) day False 0
    else Nothing
 
 entryCode :: Text
@@ -258,7 +349,7 @@ addNothings :: Day -> [[Entity Deliverable]] -> [Maybe [(Entity Deliverable)]]
 addNothings day xxs = foldl (\acc xs -> safeReplaceElement acc (getElementIndex xs) (Just xs)) nothings xxs
    where originalOffset = if gpm day > 4 then 0 else gpm day
          offset entityList = gpm $ dayFromEntityList entityList
-         dayFromEntityList ((Entity _ (Deliverable _ _ _ due _)):_) = due 
+         dayFromEntityList ((Entity _ (Deliverable _ _ _ due _ _)):_) = due 
          getElementIndex entityList = let naieve = offset entityList - originalOffset
                                       in if naieve < 0 then 5 + naieve
                                          else naieve
@@ -266,15 +357,15 @@ addNothings day xxs = foldl (\acc xs -> safeReplaceElement acc (getElementIndex 
 
 getDueThatDay :: Day -> [[Entity Deliverable]] -> Maybe [Entity Deliverable]
 getDueThatDay day xxs = findList xxs
-   where dayFromEntityList ((Entity _ (Deliverable _ _ _ due _)):_) = due
+   where dayFromEntityList ((Entity _ (Deliverable _ _ _ due _ _)):_) = due
          findList [] = Nothing
          findList (x:xs) = if dayFromEntityList x == day then Just x
                                                          else findList xs
 
 splitDels :: [Entity Deliverable] -> [[Entity Deliverable]]
 splitDels dels = groupBy delTest dels
-   where delTest (Entity _ (Deliverable _ _ _ due1 _))
-                 (Entity _ (Deliverable _ _ _ due2 _)) = due1 == due2
+   where delTest (Entity _ (Deliverable _ _ _ due1 _ _))
+                 (Entity _ (Deliverable _ _ _ due2 _ _)) = due1 == due2
 
 safeReplaceElement :: [a] -> Int -> a -> [a] 
 safeReplaceElement xs i x = 
@@ -295,3 +386,4 @@ getRight :: Bool -> Int -> (Text, Int)
 getRight True 1 = ("p", 0)
 getRight True offset = ("n", offset - 1)
 getRight _ offset = ("p", offset + 1)
+

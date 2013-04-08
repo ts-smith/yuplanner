@@ -23,6 +23,11 @@ import System.Log.FastLogger (mkLogger)
 -- Don't forget to add new modules to your cabal file!
 import Handler.Home
 import Handler.Date
+import qualified Data.Sequence as Sq
+--import Control.Concurrent
+import Control.Concurrent.STM
+--import Control.Concurrent.STM.TVar
+
 
 -- This line actually creates our YesodDispatch instance. It is the second half
 -- of the call to mkYesodData which occurs in Foundation.hs. Please see the
@@ -61,7 +66,8 @@ makeFoundation conf = do
               Database.Persist.Store.applyEnv
     p <- Database.Persist.Store.createPoolConfig (dbconf :: Settings.PersistConfig)
     logger <- mkLogger True stdout
-    let foundation = App conf s p manager dbconf logger
+    chatState <- newTVarIO (Sq.empty :: Sq.Seq ChatItem)
+    let foundation = App conf s p manager dbconf logger chatState
 
     -- Perform database migration using our application's logging settings.
     runLoggingT

@@ -22,6 +22,12 @@ import Text.Hamlet (hamletFile)
 import System.Log.FastLogger (Logger)
 
 import Data.Text
+import Util.ChatState
+import Data.Sequence
+--import Control.Concurrent
+import Control.Concurrent.STM
+--import Control.Concurrent.STM.TVar
+
 --import Data.Time
 
 -- | The site argument for your application. This can be a good place to
@@ -35,6 +41,7 @@ data App = App
     , httpManager :: Manager
     , persistConfig :: Settings.PersistConfig
     , appLogger :: Logger
+    , getChatStateTVar :: TVar (Seq ChatItem)
     }
 
 -- Set up i18n messages. See the message folder.
@@ -90,6 +97,7 @@ instance Yesod App where
             $(widgetFile "normalize")
             addStylesheet $ StaticR css_bootstrap_css
             $(widgetFile "default-layout")
+        --chatBox <- widgetToPageContent chatWidget
         hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
 
     -- This is done to provide an optimization for serving static files from
@@ -168,3 +176,31 @@ getExtra = fmap (appExtra . settings) getYesod
 -- wiki:
 --
 -- https://github.com/yesodweb/yesod/wiki/Sending-email
+
+
+{-
+chatWidget :: GWidget sub App ()
+chatWidget = do
+   toWidget [julius|
+$(document).ready(function () {
+
+    $.ajax({ 
+        url: '@{ChatStateR}',
+        type: 'POST',
+        dataType: 'json',
+        data: JSON.stringify({
+            sender: "senderdata",
+            content: "content data"
+            }),
+        timeout: 300000,
+        contentType: "application/json; charset=utf-8",
+        success: function(o) {
+            alert(o.sender + "\n" + o.time + "\n" + o.content); 
+        },
+        error: function(jqXHR, errstatus, errorThrown) {
+            alert(errstatus + "\n" + errorThrown + "\n" + jqXHR.responseText);
+        }
+    });
+});
+|]
+-}

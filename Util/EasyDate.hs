@@ -25,6 +25,9 @@ data Weekday = Monday | Tuesday | Wednesday | Thursday | Friday | Saturday | Sun
 getDay :: IO Data.Time.Calendar.Day
 getDay = fmap (localDay . zonedTimeToLocalTime) getZonedTime
 
+getTime :: IO Data.Time.LocalTime.LocalTime
+getTime = fmap zonedTimeToLocalTime getZonedTime
+
 getPastMonday :: Day -> Int
 getPastMonday day = monIndex - 1
    where (_,_,monIndex) = toWeekDate day

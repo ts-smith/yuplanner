@@ -4,17 +4,40 @@ function addAssignment(url, section, description){
          alert(data);
       });
 }
-function showForm(url, dateString, dayString, index){
+function showForm(url, dateString, dayString, caller){
 
-   if(screen.width < 800){
-      $("#target").css("left", "5%");
+   if (is_mobile) {
+      $("#target").appendTo(caller.parent().parent());
+      $("#target").addClass("mobile-panel");
+   }
+   else {
+      $("#mask").removeClass("nodisplay").addClass("display");
    }
    $("#target").css("visibility", "visible");
-   $("#targetForm").attr("action",url);
    $("#dueLabel").html(dayString + ", " + dateString);
-   $("#mask").removeClass("nodisplay").addClass("display");
+   $("#targetForm").attr("action",url);
 };
 
+$('body').click(function(){
+   revert();
+});
+
+$(".addbutton").click(function(event) {
+   event.stopPropagation();
+});
+$("#target").click(function(event) {
+   event.stopPropagation();
+});
+
+$("select").change( function() {
+   if ($(this).val == 3){
+      showAddBox();
+   }
+   else {
+      removeAddBox();
+      //should remove value from it, "unclick it"
+   }
+});
 
 function revert(){
    $("#mask").removeClass("display").addClass("nodisplay");
@@ -44,21 +67,13 @@ function actuallyDelete(url){
       });
    }
 }
-
+window.is_mobile = false;
 function moveMask(){
    $("#target").appendTo('body');
    $("#mask").appendTo('body');
    $("#deleteDiv").appendTo('body');
 
-
-   var $is_mobile = false;
-
    if( $('#mediaDetect').css('display') == 'none' ) {
-      $is_mobile = true;      
-   }
-   if ($is_mobile){
-      $("#mask").addClass("mobilePositioning");
-      $("#target").addClass("mobilePositioning");
-      $("#deleteDiv").addClass("mobilePositioning");
+      window.is_mobile = true;      
    }
 }

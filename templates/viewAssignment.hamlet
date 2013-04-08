@@ -1,0 +1,24 @@
+<div id=sigDiv>
+   $maybe sig <- signature
+      <h5>Commenting as #{sig}
+      <a href=@{UnsetR assignId}>Remove Signature
+   $nothing
+      <input type=text id=sigField>
+      <button id=sigSubmit>Set Signature
+<div id=allCommentContent>
+   <h2>#{showT day}
+   <h3>#{valToKey s sections}
+   <p>#{a}
+   <pre>#{d}
+   <h3>Comments
+   $if (length comments) == 0
+      <p>No Comments
+   $else
+      <ul>
+      $forall (Entity _ (Comment _ content mSig _)) <- comments
+         <li class=comment>
+            <h5>#{maybe "Anonymous" id mSig} wrote:
+            <pre class=commentContent>#{content}
+   <form method=post action=@{CommentR assignId} id=commentForm>
+      ^{commentWidget}
+      <input type=submit>

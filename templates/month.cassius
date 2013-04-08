@@ -3,6 +3,7 @@
 #assignmentTable
    table-layout: fixed;
 td
+   position: relative;
    vertical-align: top;
    border: 2px solid black;
    min-width:160px;
@@ -32,12 +33,23 @@ div.today
 .tableAssignment
    padding-left:3px;
 
+.tableDescription
+   margin-bottom: 0px;
+.ncomments
+   display: block;
+   text-align: right;
+   font-size: 70%;
+   margin-top: -8px;
+   margin-bottom: 9px;
+
 .BC
    background-color: #FCD800;
 .Pro
    background-color: #8FEE90;
 .ISE
    background-color: #FE4202;
+.ISE .commentLink, .ISE .commentLink:visited
+   color:black;
 .TTE
    background-color: #FEE4C3;
 .ILL

@@ -1,4 +1,4 @@
-<div id=mask class=nodisplay onclick="revert()">
+<div id=mask class=nodisplay>
 <div id=target>
    <h2 id=dueLabel>
    <form id=targetForm method=post>
@@ -35,16 +35,18 @@ $with (rb, rOffset) <- getRight neg offset
                      <div class="dateHeading #{dayStyle day}">
                         <h2>#{apostrophize $ T.drop 2 $ showT day}
                         $if (&&) (weekDay day) ((>=) day today)
-                           <div class="button calendarButton" onclick="showForm('@{AssignmentR (showT day) "month" "p" offset}', '#{showT day}', '#{toString $ gpm day}')">Add
+                           <div class="addbutton button calendarButton" onclick="showForm('@{AssignmentR (showT day) "month" "p" offset}', '#{showT day}', '#{toString $ gpm day}', $(this))">Add
                      $maybe list <- getDueThatDay day groupedDels
-                        $forall (Entity delId (Deliverable s a d dueDay _)) <- list
+                        $forall (Entity delId (Deliverable s a d dueDay _ count)) <- list
                            <div class=#{sectionToClass s}>
                               <small>
                                  <h5 class=inline> #{valToKey s sections}
                               <div>
-                                 <p class="tableAssignment inline">#{a} 
+                                 <p class="tableAssignment inline">
+                                    <a class=commentLink href=@{ViewAssignmentR delId}>#{a} 
                                     <div class=delete onclick="deleteAssignment('@{DeleteR delId "month" offset}')">X
                                  <p class=tableDescription>#{d}
+                                 <span class=ncomments>#{count} comment#{makePlural count}
                      $nothing
             $else
                <td class=invalidCell>

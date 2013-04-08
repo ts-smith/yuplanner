@@ -1,5 +1,5 @@
 <div id=mask class=nodisplay onclick="revert()">
-<div id=target class="hidden hTform">
+<div id=target>
    <h2 id=dueLabel>
    <form id=targetForm method=post>
       ^{fWidget}
@@ -18,14 +18,15 @@ $if goLeft
       <li class=day id=index#{index}>
          <h2>#{T.pack $ niceFormat offset day}
          $with d <- showT day
-            <div class="submitButton button" onclick="showForm('@{AssignmentR d "week" "p" week}', '#{d}', '#{toString offset}', '#{index}')">Post Assignment
+            <div class="addbutton submitButton button" onclick="showForm('@{AssignmentR d "week" "p" week}', '#{d}', '#{toString offset}', '#{index}')">Post Assignment
          <ul>
             $maybe entList <- dayEnts
-               $forall (Entity delId (Deliverable s a d _ _))<- entList
+               $forall (Entity delId (Deliverable s a d _ _ count))<- entList
                   <li class=inline>
                      <h3 class=inline>#{valToKey s sections}
                      <div class=panel>
-                        <p class="assignment inline">#{a} 
+                        <p class="assignment inline">
+                           <a class=commentLink href=@{ViewAssignmentR delId}>#{a} 
                            <div class=delete onclick="deleteAssignment('@{DeleteR delId "week" week}')">X
                         <pre class=description>#{d}
 

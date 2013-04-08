@@ -1,0 +1,18 @@
+$("#sigSubmit").click(function(){
+   signature = $("#sigField").val();
+   $.ajax({ 
+     url: '@{SignatureR}',
+     type: 'POST',
+     dataType: 'json',
+     data: JSON.stringify({
+         signature: signature
+         }),
+     contentType: "application/json; charset=utf-8",
+     success: function(o) {
+         $("#sigDiv").html("<h5>Commenting as " + o.signature + "</h5>\n<a href=@{UnsetR assignId}>Remove Signature</a>\n");
+     },
+     error: function(jqXHR, errstatus, errorThrown) {
+         alert(errorThrown);
+     }
+   });
+});
