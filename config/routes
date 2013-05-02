@@ -28,6 +28,5 @@
 /signature SignatureR POST
 /removeSig/#DeliverableId UnsetR GET
 
-/chatState ChatStateR GET POST
 
 /redir  RedirR GET

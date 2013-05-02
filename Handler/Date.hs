@@ -248,29 +248,7 @@ getUnsetR returnId = do
    redirect $ ViewAssignmentR returnId
 
 
-getChatStateR :: Handler RepJson
-getChatStateR = do
-   yesod <- getYesod
-   let csTVar = getChatStateTVar yesod
-   localTime <- liftIO getTime
-   --itemSequence <- liftIO $ readTVarIO csTVar
-   newSequence <- liftIO $ atomically $ do 
-      oldSeq <- readTVar csTVar
-      let newSeq = Sq.take 50 $ (Sq.|>) oldSeq $ ChatItem "the sender" localTime "the content"
-      writeTVar csTVar newSeq
-      return newSeq
-   
-   --defaultLayout $ do [whamlet| #{show $ Sq.length newSequence} |]
-   jsonToRepJson $ ChatItem "the sender" localTime "the content"
 
-postChatStateR :: Handler RepJson
-postChatStateR = do 
-   (Timeless ts tc) <- parseJsonBody_
-   time <- liftIO getTime
-   let second = 1000000
-   liftIO $ threadDelay (10 * second)
-   jsonToRepJson $ ChatItem ts time tc
-   
 
 
 validPasswordField :: (RenderMessage master FormMessage) => Field sub master Text

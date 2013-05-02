@@ -28,6 +28,13 @@ $(".addbutton").click(function(event) {
 $("#target").click(function(event) {
    event.stopPropagation();
 });
+$(".delete").click(function(event) {
+   event.stopPropagation();
+});
+$("#deleteDiv").click(function(event){
+   event.stopPropagation();
+});
+
 
 $("select").change( function() {
    if ($(this).val == 3){
